@@ -2,27 +2,32 @@
 import random
 
 
-class Neuron:   # запись структуры сети в виде матрицы
+class Neuron:  # запись структуры сети в виде матрицы
     matrix = []
     size = 5
 
     def init_matrix(self):
-        i = 0
-        j = 0
-        while i < self.size:
-            small_matr = []
-            while j < self.size:
+        for i in range(self.size):
+            small_matrix = []
+            for j in range(self.size):
                 if i == j:
-                    small_matr.append(0)
-                    j += 1
+                    small_matrix.append(0)
                     continue
-                if random.random() >= 0.3:
-                    small_matr.append(random.randint(0, 1))
-                    j += 1
+                if random.random() >= 0.4:
+                    small_matrix.append(round(random.random(), 2))
                 else:
-                    small_matr.append(0)
-                    j += 1
-            self.matrix.append(small_matr)
-            i += 1
-            j = 0
+                    small_matrix.append(0)
+            self.matrix.append(small_matrix)
+
+        for i in range(self.size):
+            for j in range(self.size):
+                if self.matrix[i][j] != 0:
+                    self.matrix[j][i] = 0
+
         return self.matrix
+
+# для проверки пусть пока побудет тут
+m = Neuron()
+ma = m.init_matrix()
+for i in range(5):
+    print(ma[i])
