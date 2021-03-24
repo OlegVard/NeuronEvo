@@ -1,4 +1,3 @@
-# file for network
 import random
 
 
