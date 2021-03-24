@@ -26,9 +26,3 @@ class Neuron:   # запись структуры сети в виде матр�
             i += 1
             j = 0
         return self.matrix
-
-
-m = Neuron()
-ma = m.init_matrix()
-for i in range(5):
-    print(ma[i])
