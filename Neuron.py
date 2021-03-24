@@ -19,12 +19,13 @@ class Neuron:  # запись структуры сети в виде матри
                     small_matrix.append(0)
             self.matrix.append(small_matrix)
 
-        for i in range(self.size):
+        for i in range(self.size):  # для напровалений
             for j in range(self.size):
                 if self.matrix[i][j] != 0:
                     self.matrix[j][i] = 0
 
         return self.matrix
+
 
 # для проверки пусть пока побудет тут
 m = Neuron()
