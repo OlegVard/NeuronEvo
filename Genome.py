@@ -1,6 +1,10 @@
 from Genes import NodeType, Node, Connections
 import random
+from graphviz import Digraph
 from copy import deepcopy
+import os
+
+os.environ["PATH"] += os.pathsep + "C:/Program Files/Graphviz/bin"
 
 
 class Genome:
@@ -20,16 +24,16 @@ class Genome:
         self.node_innovation += 1
         return temp
 
-    def add_connection(self, connection):
-        self.connections[connection.innovation] = connection
+    def add_connection(self, conn):
+        self.connections[conn.innovation] = conn
 
     def add_node(self, node):
         self.nodes[node.id] = node
 
     def mutate_node(self):
-        conn = random.choice(list(self.connections.values()))
-        inp = self.nodes[conn.inp]
-        out = self.nodes[conn.out]
+        conn = random.choice(self.connections)
+        inp = self.nodes[conn.input_n]
+        out = self.nodes[conn.output]
 
         conn.state = False
 
@@ -42,20 +46,19 @@ class Genome:
         self.add_connection(from_new)
 
     def mutate_weights(self):
-        for conn in self.connections.values():
+        for conn in self.connections:
             if random.random() < 0.5:
                 conn.weight = conn.weight * random.random()
-            else:
-                conn.weight = random.random()
+                self.conn_innovation += 1
 
     @staticmethod
     def crossover(parent_a, parent_b):
         child = Genome()
 
-        for(_, parent_node) in parent_a.nodes.items():
+        for (_, parent_node) in parent_a.nodes.items():
             child.add_node(deepcopy(parent_node))
 
-        for(_, parent_conn) in parent_a.connections.items():
+        for (_, parent_conn) in parent_a.connections.items():
             if parent_conn.innovation in parent_b.connections:
                 if random.random() < 0.5:
                     child_conn = deepcopy(parent_conn)
@@ -66,3 +69,15 @@ class Genome:
                 child.add_connection(deepcopy(parent_conn))
 
         return child
+
+    def render(self, filename):
+        dot = Digraph()
+
+        for (i, node) in self.nodes.items():
+            dot.node(str(i))
+
+        for (i, conn) in self.connections.items():
+            if conn.state:
+                dot.edge(str(conn.input_n), str(conn.output), "{:.0f}, {:.2f}".format(conn.innovation, conn.weight))
+
+        dot.render(filename)
