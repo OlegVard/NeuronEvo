@@ -68,6 +68,7 @@ class Neuron:
         out1 = sum(sum_out_1)
         out2 = sum(sum_out_2)
 
+
         fitness1 = data[self.number_of_in + self.number_of_out - 1] - out1
         fitness2 = data[self.number_of_in + self.number_of_out - 2] - out2
         return fitness1, fitness2
