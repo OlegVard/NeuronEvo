@@ -1,7 +1,7 @@
 import random
 from Genome import Genome
 from Genes import Connections, Node, NodeType
-import numpy as np
+import math
 
 
 class Neuron:
@@ -51,23 +51,27 @@ class Neuron:
         return population
 
     def forward(self, net):
-        data = self.data.pop(self.data_iter)
+        data = self.data
         self.data_iter += 1
         sum_out_1 = []
         sum_out_2 = []
+        sum_hidden = []
 
-        for (i, conn) in net.connection:
+        for (i, conn) in net.connections.items():
+            x = data[i - 1] * conn.weight
             if conn.output == self.number_of_in + self.number_of_out:
-                sum_out_1.append(self.sigmoid(data(i) * conn.weight))
+                sum_out_1.append(self.sigmoid(x))
+            elif conn.output == self.number_of_in + self.number_of_out - 1:
+                sum_out_2.append(self.sigmoid(x))
             else:
-                sum_out_2.append(self.sigmoid(data(i) * conn.weight))
+                sum_hidden.append(self.sigmoid(x))
         out1 = sum(sum_out_1)
         out2 = sum(sum_out_2)
 
-        fitness = (data[self.number_of_in + self.number_of_out - 1] - out1 +
-                   data[self.number_of_in + self.number_of_out - 2] - out2) / 2
-        return fitness
+        fitness1 = data[self.number_of_in + self.number_of_out - 1] - out1
+        fitness2 = data[self.number_of_in + self.number_of_out - 2] - out2
+        return fitness1, fitness2
 
     @staticmethod
     def sigmoid(x):
-        return 1 / (1 + np.exp(-x))
+        return 1 / (1 + math.exp(-x))
