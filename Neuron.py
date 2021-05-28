@@ -53,25 +53,25 @@ class Neuron:
     def forward(self, net):
         data = self.data
         self.data_iter += 1
-        sum_out_1 = []
-        sum_out_2 = []
-        sum_hidden = []
+        sum_matrix = [0.0] * len(net.nodes)
+        for i in range(len(net.nodes)):
+            sum_matrix[i] = [0.0] * len(net.nodes)
 
         for (i, conn) in net.connections.items():
-            x = data[i - 1] * conn.weight
-            if conn.output == self.number_of_in + self.number_of_out:
-                sum_out_1.append(self.sigmoid(x))
-            elif conn.output == self.number_of_in + self.number_of_out - 1:
-                sum_out_2.append(self.sigmoid(x))
+            if not conn.state:
+                continue
+            in_node = conn.input_n - 1
+            out_node = conn.output - 1
+            if sum(sum_matrix[in_node]) == 0.0:
+                x = data[i - 1] * conn.weight
             else:
-                sum_hidden.append(self.sigmoid(x))
-        out1 = sum(sum_out_1)
-        out2 = sum(sum_out_2)
+                x = sum(sum_matrix[in_node]) * conn.weight
+            sum_matrix[out_node][in_node] = self.sigmoid(x)
 
+        out1 = sum(sum_matrix[self.number_of_out + self.number_of_in - 2])
+        out2 = sum(sum_matrix[self.number_of_out + self.number_of_in - 1])
 
-        fitness1 = data[self.number_of_in + self.number_of_out - 1] - out1
-        fitness2 = data[self.number_of_in + self.number_of_out - 2] - out2
-        return fitness1, fitness2
+        return out1, out2
 
     @staticmethod
     def sigmoid(x):
