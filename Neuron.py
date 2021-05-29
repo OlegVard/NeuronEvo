@@ -62,7 +62,7 @@ class Neuron:
                 continue
             in_node = conn.input_n - 1
             out_node = conn.output - 1
-            if sum(sum_matrix[in_node]) == 0.0:
+            if in_node < self.number_of_in:
                 x = data[i - 1] * conn.weight
             else:
                 x = sum(sum_matrix[in_node]) * conn.weight
