@@ -37,7 +37,7 @@ class Genome:
 
         conn.state = False
 
-        new = Node(NodeType.hidden, self.node_innovations())
+        new = Node(NodeType.Hidden, self.node_innovations())
         to_new = Connections(inp.id, new.id, 1.0, True, self.connections_innovations())
         from_new = Connections(new.id, out.id, conn.weight, True, self.connections_innovations())
 
@@ -45,11 +45,41 @@ class Genome:
         self.add_connection(to_new)
         self.add_connection(from_new)
 
-    def mutate_weights(self):
-        for conn in self.connections:
-            if random.random() < 0.5:
-                conn.weight = conn.weight * random.random()
-                self.conn_innovation += 1
+    def mutate_connection(self):
+        if len(self.nodes) == 1:
+            return
+
+        index_1 = random.choice(list(self.nodes.keys()))
+        index_2 = random.choice(list(self.nodes.keys()))
+
+        while index_1 == index_2:
+            index_2 = random.choice(list(self.nodes.keys()))
+
+        node_1 = self.nodes[index_1]
+        node_2 = self.nodes[index_2]
+
+        while node_1.type == NodeType.Input and node_2.type == NodeType.Input:
+            index_2 = random.choice(list(self.nodes.keys()))
+            node_2 = self.nodes[index_2]
+
+        if (node_1.type == NodeType.Hidden and node_2.type == NodeType.Input) or \
+                (node_1.type == NodeType.Output and node_2.type == NodeType.Hidden) or \
+                (node_1.type == NodeType.Output and node_2.type == NodeType.Input):
+            node_1, node_2 = node_2, node_1
+
+        for (_, conn) in self.connections.items():
+            if (conn.input_n == node_1.id and conn.output == node_2.id) or \
+                    (conn.input_n == node_2.id and conn.output == node_1.id):
+                self.mutate_connection()
+                return
+
+        self.add_connection(Connections(
+            index_1,
+            index_2,
+            random.random() * 2.0 - 1.0,
+            True,
+            self.connections_innovations(),
+        ))
 
     @staticmethod
     def crossover(parent_a, parent_b):
