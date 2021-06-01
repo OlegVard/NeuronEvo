@@ -52,31 +52,34 @@ class Neuron:
         return population
 
     def forward(self, net):
-        data = self.data
-        self.data_iter += 1
+        data = self.data[self.data_iter]
+        if self.data_iter > 500:
+            self.data_iter = 0
         sum_matrix = [0.0] * len(net.nodes)
         data_iter = 0
         for i in range(len(net.nodes)):
             sum_matrix[i] = [0.0] * len(net.nodes)
-
+        previous_node = -1
         for (i, conn) in net.connections.items():
             if not conn.state:
                 continue
             in_node = conn.input_n - 1
             out_node = conn.output - 1
-            if in_node < self.number_of_in:
+            if in_node < self.number_of_in and in_node != previous_node:
                 x = data[data_iter] * conn.weight
                 data_iter += 1
+            elif in_node < self.number_of_in and in_node == previous_node:
+                x = data[data_iter] * conn.weight
             else:
                 x = sum(sum_matrix[in_node]) * conn.weight
+            previous_node = in_node
             sum_matrix[out_node][in_node] = self.sigmoid(x)
 
         out1 = self.sigmoid(sum(sum_matrix[self.number_of_out + self.number_of_in - 2]))
         out2 = self.sigmoid(sum(sum_matrix[self.number_of_out + self.number_of_in - 1]))
 
         # self.back_propagation(net, sum_matrix, out1, out2)
-
-        return out1, out2
+        return out1, out2, data[-2:]
 
     def back_propagation(self, net, sum_matrix, out1, out2):
         lr_speed = 0.001    # weigh + correction * weigh_out * (1-last_act) * lr_speed
