@@ -60,21 +60,20 @@ class Neuron:
 
         for i in range(len(net.nodes)):
             sum_matrix[i] = [0.0] * len(net.nodes)
-        previous_node = -1
-
+        previous_list = []
         for (_, conn) in net.connections.items():
             if not conn.state:
                 continue
             in_node = conn.input_n - 1
             out_node = conn.output - 1
-            if in_node < self.number_of_in and in_node != previous_node:
+            if in_node < self.number_of_in and in_node not in previous_list:
                 data_iter += 1
                 x = data[data_iter] * conn.weight
-            elif in_node < self.number_of_in and in_node == previous_node:
+            elif in_node < self.number_of_in and in_node in previous_list:
                 x = data[data_iter] * conn.weight
             else:
                 x = sum(sum_matrix[in_node]) * conn.weight
-            previous_node = in_node
+            previous_list.append(in_node)
             sum_matrix[out_node][in_node] = self.sigmoid(x)
 
         out1 = self.sigmoid(sum(sum_matrix[self.number_of_out + self.number_of_in - 2]))
