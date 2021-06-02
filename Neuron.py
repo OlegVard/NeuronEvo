@@ -57,17 +57,19 @@ class Neuron:
             self.data_iter = 0
         sum_matrix = [0.0] * len(net.nodes)
         data_iter = 0
+
         for i in range(len(net.nodes)):
             sum_matrix[i] = [0.0] * len(net.nodes)
         previous_node = -1
-        for (i, conn) in net.connections.items():
+
+        for (_, conn) in net.connections.items():
             if not conn.state:
                 continue
             in_node = conn.input_n - 1
             out_node = conn.output - 1
             if in_node < self.number_of_in and in_node != previous_node:
-                x = data[data_iter] * conn.weight
                 data_iter += 1
+                x = data[data_iter] * conn.weight
             elif in_node < self.number_of_in and in_node == previous_node:
                 x = data[data_iter] * conn.weight
             else:

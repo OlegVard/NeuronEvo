@@ -31,14 +31,14 @@ class Genome:
         self.nodes[node.id] = node
 
     def mutate_node(self):
-        conn = random.choice(self.connections)
+        conn_index = random.randint(1, len(self.connections))
+        conn = self.connections.get(conn_index)
         inp = self.nodes[conn.input_n]
         out = self.nodes[conn.output]
-
         conn.state = False
 
         new = Node(NodeType.Hidden, self.node_innovations())
-        to_new = Connections(inp.id, new.id, 1.0, True, self.connections_innovations())
+        to_new = Connections(inp.id, new.id, round(random.random()), True, self.connections_innovations())
         from_new = Connections(new.id, out.id, conn.weight, True, self.connections_innovations())
 
         self.add_node(new)
@@ -84,6 +84,8 @@ class Genome:
     @staticmethod
     def crossover(parent_a, parent_b):
         child = Genome()
+        child.node_innovation = parent_a.node_innovation
+        child.conn_innovation = parent_a.conn_innovation
 
         for (_, parent_node) in parent_a.nodes.items():
             child.add_node(deepcopy(parent_node))
