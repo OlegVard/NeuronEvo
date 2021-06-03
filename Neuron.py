@@ -2,6 +2,7 @@ import random
 from Genome import Genome
 from Genes import Connections, Node, NodeType
 from Data import get_data
+import numpy as np
 import math
 
 
@@ -79,12 +80,12 @@ class Neuron:
         out1 = self.sigmoid(sum(sum_matrix[self.number_of_out + self.number_of_in - 2]))
         out2 = self.sigmoid(sum(sum_matrix[self.number_of_out + self.number_of_in - 1]))
 
-        # self.back_propagation(net, sum_matrix, out1, out2)
+        self.back_propagation(net, sum_matrix, out1, out2, data)
         return out1, out2, data[-2:]
 
-    def back_propagation(self, net, sum_matrix, out1, out2):
+    def back_propagation(self, net, sum_matrix, out1, out2, data):
         lr_speed = 0.001    # weigh + correction * weigh_out * (1-last_act) * lr_speed
-        result_data = self.data[-2:]
+        result_data = data[-2:]
         error_1 = result_data[0] - out1
         correction_1 = error_1/out1
         error_2 = result_data[1] - out2
