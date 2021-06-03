@@ -73,17 +73,17 @@ class Neuron:
             elif in_node < self.number_of_in and in_node in previous_list:
                 x = data[data_iter] * conn.weight
             else:
-                x = sum(sum_matrix[in_node]) * conn.weight
+                x = np.sum(sum_matrix[in_node]) * conn.weight
             previous_list.append(in_node)
             sum_matrix[out_node][in_node] = self.sigmoid(x)
 
-        out1 = self.sigmoid(sum(sum_matrix[self.number_of_out + self.number_of_in - 2]))
-        out2 = self.sigmoid(sum(sum_matrix[self.number_of_out + self.number_of_in - 1]))
+        out1 = self.sigmoid(np.sum(sum_matrix[self.number_of_out + self.number_of_in - 2]))
+        out2 = self.sigmoid(np.sum(sum_matrix[self.number_of_out + self.number_of_in - 1]))
 
         self.back_propagation(net, sum_matrix, out1, out2, data)
         return out1, out2, data[-2:]
 
-    def back_propagation(self, net, sum_matrix, out1, out2, data):
+    def back_propagation(self, net, sum_matrix, out1, out2, data):  # Don't need here
         lr_speed = 0.001    # weigh + correction * weigh_out * (1-last_act) * lr_speed
         result_data = data[-2:]
         error_1 = result_data[0] - out1
@@ -119,7 +119,7 @@ class Neuron:
             for i in range(len(index_list3)):
                 for (_, conn) in net.connections.items():
                     if conn.input_n in index_list3[i] and conn.output > self.number_of_out + self.number_of_in:
-                        out3 = self.sigmoid(sum(sum_matrix[self.number_of_out + self.number_of_in + i]))
+                        out3 = self.sigmoid(np.sum(sum_matrix[self.number_of_out + self.number_of_in + i]))
                         conn.weight = conn.weight + correction * out3 * (1 - out3) * lr_speed
             return
 

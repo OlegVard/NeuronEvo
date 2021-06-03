@@ -47,11 +47,9 @@ for i in range(10000):
                 else:
                     new_pop[j].mutate_node()
 
-        if i % 50 == 0:
+        if i % 100 == 0:
             print('iteration', i, 'best', best)
             name = 'iteration' + str(i) + '.gv'
             population[best_index].render(name)
         population.clear()
         population = new_pop
-
-# print(cell_funk(population, net))
