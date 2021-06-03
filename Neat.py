@@ -19,11 +19,11 @@ def cell_funk(persons, net_obj):
     return fitness_list
 
 
-for i in range(10):
+for i in range(10000):
     fit_list = cell_funk(population, net)
     best = min(fit_list)
     best_index = fit_list.index(best)
-    if best == 0 or best[0] < 2.0e-16:
+    if best[0] < 2.0e-10:
         print('Алгоритм завершен')
         population[best_index].render('final.gv')
         break
@@ -47,7 +47,8 @@ for i in range(10):
                 else:
                     new_pop[j].mutate_node()
 
-        if i % 2 == 0:
+        if i % 50 == 0:
+            print('iteration', i, 'best', best)
             name = 'iteration' + str(i) + '.gv'
             population[best_index].render(name)
         population.clear()
