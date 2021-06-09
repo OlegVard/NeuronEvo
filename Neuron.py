@@ -20,35 +20,29 @@ class Neuron:
             a = Genome()
             for j in range(self.number_of_in + self.number_of_out):
                 if j < self.number_of_in:
-                    a.add_node(Node(NodeType.Input, j + 1))
+                    a.add_node(Node(NodeType.Input, a.node_innovations()))
                 else:
-                    a.add_node(Node(NodeType.Output, j + 1))
-                a.node_innovation += 1
+                    a.add_node(Node(NodeType.Output, a.node_innovations()))
             for j in range(self.number_of_in):
                 out = random.choice([self.number_of_in + 1, self.number_of_in + 2])
                 a.add_connection(Connections(j + 1,
                                              out,
                                              round(random.random(), 2),
                                              True,
-                                             a.conn_innovation + 1))
-                a.conn_innovation += 1
+                                             a.connections_innovations()))
                 if random.random() < 0.2:
                     if out == self.number_of_in + 1:
                         a.add_connection(Connections(j + 1,
                                                      self.number_of_in + 2,
                                                      round(random.random(), 2),
                                                      True,
-                                                     a.conn_innovation + 1))
-                        a.conn_innovation += 1
+                                                     a.connections_innovations()))
                     else:
                         a.add_connection(Connections(j + 1,
                                                      self.number_of_in + 1,
                                                      round(random.random(), 2),
                                                      True,
-                                                     a.conn_innovation + 1))
-                        a.conn_innovation += 1
-            a.conn_innovation += 1
-            a.node_innovation += 1
+                                                     a.connections_innovations()))
             population.append(a)
         return population
 
@@ -80,7 +74,6 @@ class Neuron:
         out1 = self.sigmoid(np.sum(sum_matrix[self.number_of_out + self.number_of_in - 2]))
         out2 = self.sigmoid(np.sum(sum_matrix[self.number_of_out + self.number_of_in - 1]))
 
-        self.back_propagation(net, sum_matrix, out1, out2, data)
         return out1, out2, data[-2:]
 
     def back_propagation(self, net, sum_matrix, out1, out2, data):  # Don't need here

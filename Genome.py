@@ -11,8 +11,8 @@ class Genome:
     def __init__(self):
         self.connections = {}
         self.nodes = {}
-        self.conn_innovation = 0
-        self.node_innovation = 0
+        self.conn_innovation = 1
+        self.node_innovation = 1
 
     def connections_innovations(self):
         temp = self.conn_innovation
@@ -77,7 +77,6 @@ class Genome:
             while index_1 == 10 or index_1 == 11:
                 index_1 = random.randint(1, len(self.nodes))
 
-
         if node_1.type == NodeType.Hidden and node_2.type == NodeType.Input:
             node_1, node_2 = node_2, node_1
 
@@ -109,18 +108,18 @@ class Genome:
         for (_, parent_node) in parent_a.nodes.items():
             child.add_node(deepcopy(parent_node))
 
-        for (_, parent_conn) in parent_a.connections.items():
-            child.add_connection(deepcopy(parent_conn))
-
-        for (_, parent_conn) in parent_b.connections.items():
-            if parent_conn.innovation in parent_a.connections:
-                if not child.already_connected(parent_conn):
-                    if parent_conn.output in child.nodes.keys():
-                        if parent_conn.input_n in child.nodes.keys():
-                            if random.random() < 0.5:
-                                child.add_connection(parent_conn)
-
-        child.is_connected()
+        for conn in parent_a.connections.values():
+            try:
+                conn2 = parent_b.connections[conn.innovation]
+            except KeyError:
+                child.add_connection(deepcopy(conn))
+            else:
+                if conn.innovation == conn2.innovation:
+                    child.add_connection(Connections(conn.input_n,
+                                                     conn.output,
+                                                     random.choice((conn.weight, conn2.weight)),
+                                                     random.choice((conn.state, conn2.state)),
+                                                     conn.innovation))
 
         return child
 
@@ -147,55 +146,3 @@ class Genome:
             else:
                 flag = False
         return flag
-
-    def is_connected(self):
-        for (_, node) in self.nodes.items():
-            flag_in = False
-            flag_out = False
-            for (_, conn) in self.connections.items():
-                if node.type == NodeType.Input:
-                    if conn.input_n == node.id:
-                        flag_in = True
-                        break
-                elif node.type == NodeType.Output:
-                    if conn.output == node.id:
-                        flag_out = True
-                        break
-                else:
-                    if conn.input_n == node.id:
-                        flag_in = True
-                    if conn.output == node.id:
-                        flag_out = True
-                        if flag_in:
-                            break
-            if node.type == NodeType.Input:
-                if not flag_in:
-                    self.add_connection(Connections(node.id,
-                                                    random.randint(10, len(self.nodes)),
-                                                    round(random.random()),
-                                                    True,
-                                                    self.connections_innovations()))
-            elif node.type == NodeType.Output:
-                if not flag_out:
-                    index_in = random.randint(1, len(self.nodes))
-                    while index_in == 11 or index_in == 10:
-                        index_in = random.randint(1, len(self.nodes))
-                    self.add_connection(Connections(index_in,
-                                                    node.id,
-                                                    round(random.random()),
-                                                    True,
-                                                    self.connections_innovations()))
-            else:
-                if not flag_in and not flag_out:
-                    index_in = random.randint(1, 9)
-                    index_out = random.randint(10, len(self.nodes))
-                    self.add_connection(Connections(index_in,
-                                                    node.id,
-                                                    round(random.random()),
-                                                    True,
-                                                    self.connections_innovations()))
-                    self.add_connection(Connections(node.id,
-                                                    index_out,
-                                                    round(random.random()),
-                                                    True,
-                                                    self.connections_innovations()))
