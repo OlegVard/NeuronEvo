@@ -153,5 +153,57 @@ class Genome:
         Bt = 0.15
         for i in range(num_types):
             N = max((len(type_a[i].connections), len(type_b.connections)))
+            B = (c1 * Genome.excess_genes(type_a[i], type_b) +
+                 c2 * Genome.disjoint_genes(type_a[i], type_b)) / N + \
+                c3 * Genome.match_genes(type_a[i], type_b)
+            if Bt > B:
+                type_b.species = i
+                break
+            else:
+                type_b.species = num_types + 1
 
-        pass
+    @staticmethod
+    def match_genes(a, b):
+        match_gene = 0
+        result = 0
+        max_a = max(a.connections.keys())
+        max_b = max(b.connections.keys())
+        max_all = max(max_a, max_b)
+
+        for i in range(max_all + 1):
+            if i in a.connections and i in b.connections:
+                match_gene += 1
+                result += (a.connections[i].weight + b.connections[i].weight) / 2
+        return result / match_gene
+
+    @staticmethod
+    def disjoint_genes(a, b):
+        disjoint_genes = 0
+
+        max_a = max(a.connections.keys())
+        max_b = max(b.connections.keys())
+        max_all = max(max_a, max_b)
+
+        for i in range(max_all + 1):
+            if (i not in a.connections and i in b.connections and max_a > i) or\
+                    (i in a.connections and i not in b.connections and max_b > i):
+                disjoint_genes += 1
+
+        return disjoint_genes
+
+    @staticmethod
+    def excess_genes(a, b):
+        excess_genes = 0
+
+        max_a = max(a.connections.keys())
+        max_b = max(b.connections.keys())
+        indices = max(max_a, max_b)
+
+        for i in range(indices + 1):
+            if (i not in a.connections and i in b.connections and max_a < i) \
+                    or (i in a.connections and i not in b.connections and max_b < i):
+                excess_genes += 1
+
+        return excess_genes
+
+

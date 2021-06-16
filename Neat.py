@@ -3,10 +3,24 @@ from Genome import Genome
 import random
 
 net = Neuron(9, 2, 10)
-population = [net.create()]
+population = net.create()
 
 
 def cell_funk(persons, net_obj):
+    fitness_list = []
+    for person in persons:
+        for one in person:
+            out1, out2, reference = net_obj.forward(one)
+            out1 = reference[0] - out1
+            out2 = reference[1] - out2
+            fitness = (out1 + out2) / 2
+            fitness_list.append([abs(fitness)])
+
+    net_obj.data_iter += 1
+    return fitness_list
+
+
+def _cell_funk(persons, net_obj):
     fitness_list = []
     for person in persons:
         out1, out2, reference = net_obj.forward(person)
@@ -20,7 +34,7 @@ def cell_funk(persons, net_obj):
 
 
 for i in range(10000000):
-    fit_list = cell_funk(population, net)
+    fit_list = _cell_funk(population, net)
     best = min(fit_list)
     best_index = fit_list.index(best)
     if best[0] < 1.0e-3:
@@ -57,5 +71,4 @@ for i in range(10000000):
             best = min(fit_list)
             best_index = fit_list.index(best)
 
-        population.clear()
         population = new_pop

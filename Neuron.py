@@ -45,7 +45,7 @@ class Neuron:
             population.append(a)
         return population
 
-    def forward(self, net):
+    def forward(self, net):     # переделать
         data = self.data[self.data_iter]
         if self.data_iter > 500:
             self.data_iter = 0
