@@ -3,7 +3,7 @@ from Genome import Genome
 import random
 
 net = Neuron(9, 2, 10)
-population = net.create()
+population = [net.create()]
 
 
 def cell_funk(persons, net_obj):
@@ -19,7 +19,7 @@ def cell_funk(persons, net_obj):
     return fitness_list
 
 
-for i in range(10000):
+for i in range(10000000):
     fit_list = cell_funk(population, net)
     best = min(fit_list)
     best_index = fit_list.index(best)
@@ -47,14 +47,15 @@ for i in range(10000):
                 else:
                     new_pop[j].mutate_node()
 
-        if i % 10 == 0:
+        if i % 50 == 0:
             print('iteration', i, 'best', best)
             name = 'iteration' + str(i) + '.gv'
             population[best_index].render(name)
+        for _ in range(4):
+            new_pop.append(population.pop(best_index))
+            fit_list.remove(best)
+            best = min(fit_list)
+            best_index = fit_list.index(best)
+
+        population.clear()
         population = new_pop
-        n = 0
-        for p in population:
-            name = str(i) + str(n)
-            n += 1
-            p.render(name)
-        n = 0

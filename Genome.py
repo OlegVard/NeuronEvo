@@ -13,6 +13,7 @@ class Genome:
         self.nodes = {}
         self.conn_innovation = 1
         self.node_innovation = 1
+        self.species = 0
 
     def connections_innovations(self):
         temp = self.conn_innovation
@@ -89,6 +90,7 @@ class Genome:
         for (_, conn) in self.connections.items():
             if (conn.input_n == node_1.id and conn.output == node_2.id) or \
                     (conn.input_n == node_2.id and conn.output == node_1.id):
+                self.mutate_connection()
                 return
 
         self.add_connection(Connections(
@@ -114,12 +116,11 @@ class Genome:
             except KeyError:
                 child.add_connection(deepcopy(conn))
             else:
-                if conn.innovation == conn2.innovation:
-                    child.add_connection(Connections(conn.input_n,
-                                                     conn.output,
-                                                     random.choice((conn.weight, conn2.weight)),
-                                                     random.choice((conn.state, conn2.state)),
-                                                     conn.innovation))
+                child.add_connection(Connections(conn.input_n,
+                                                 conn.output,
+                                                 (conn.weight + conn2.weight) / 2,
+                                                 Genome.XOR(conn.state, conn2.state),
+                                                 conn.innovation))
 
         return child
 
@@ -135,14 +136,22 @@ class Genome:
 
         dot.render(filename)
 
-    def already_connected(self, conn):
-        flag = False
-        if len(self.connections) == 0:
-            return flag
-        for (_, connection) in self.connections.items():
-            if conn.input_n == connection.input_n and conn.output == connection.output:
-                flag = True
-                break
-            else:
-                flag = False
-        return flag
+    @staticmethod
+    def XOR(a, b):
+        if a and b:
+            return a
+        elif a and not b:
+            return a
+        elif not a and b:
+            return a
+        else:
+            return b
+
+    @staticmethod
+    def types_division(type_a, type_b, num_types):
+        c1, c2, c3 = 0.3, 0.3, 0.3
+        Bt = 0.15
+        for i in range(num_types):
+            N = max((len(type_a[i].connections), len(type_b.connections)))
+
+        pass
