@@ -166,8 +166,8 @@ class Genome:
     def match_genes(a, b):
         match_gene = 0
         result = 0
-        max_a = max(a.connections.keys())
-        max_b = max(b.connections.keys())
+        max_a = len(a.connections.keys())
+        max_b = len(b.connections.keys())
         max_all = max(max_a, max_b)
 
         for i in range(max_all + 1):
@@ -180,8 +180,8 @@ class Genome:
     def disjoint_genes(a, b):
         disjoint_genes = 0
 
-        max_a = max(a.connections.keys())
-        max_b = max(b.connections.keys())
+        max_a = len(a.connections.keys())
+        max_b = len(b.connections.keys())
         max_all = max(max_a, max_b)
 
         for i in range(max_all + 1):
@@ -195,8 +195,8 @@ class Genome:
     def excess_genes(a, b):
         excess_genes = 0
 
-        max_a = max(a.connections.keys())
-        max_b = max(b.connections.keys())
+        max_a = len(a.connections.keys())
+        max_b = len(b.connections.keys())
         indices = max(max_a, max_b)
 
         for i in range(indices + 1):
