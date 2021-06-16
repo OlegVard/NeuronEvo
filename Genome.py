@@ -119,7 +119,7 @@ class Genome:
                 child.add_connection(Connections(conn.input_n,
                                                  conn.output,
                                                  (conn.weight + conn2.weight) / 2,
-                                                 Genome.XOR(conn.state, conn2.state),
+                                                 Genome.T_or_F(conn.state, conn2.state),
                                                  conn.innovation))
 
         return child
@@ -137,7 +137,7 @@ class Genome:
         dot.render(filename)
 
     @staticmethod
-    def XOR(a, b):
+    def T_or_F(a, b):
         if a and b:
             return a
         elif a and not b:
@@ -152,15 +152,14 @@ class Genome:
         c1, c2, c3 = 0.3, 0.3, 0.3
         Bt = 0.15
         for i in range(num_types):
-            N = max((len(type_a[i].connections), len(type_b.connections)))
-            B = (c1 * Genome.excess_genes(type_a[i], type_b) +
-                 c2 * Genome.disjoint_genes(type_a[i], type_b)) / N + \
-                c3 * Genome.match_genes(type_a[i], type_b)
+            N = max((len(type_a[i][0].connections), len(type_b.connections)))
+            B = (c1 * Genome.excess_genes(type_a[i][0], type_b) +
+                 c2 * Genome.disjoint_genes(type_a[i][0], type_b)) / N + \
+                c3 * Genome.match_genes(type_a[i][0], type_b)
             if Bt > B:
                 type_b.species = i
-                break
-            else:
-                type_b.species = num_types + 1
+                return
+        type_b.species = num_types + 1
 
     @staticmethod
     def match_genes(a, b):
@@ -205,5 +204,3 @@ class Genome:
                 excess_genes += 1
 
         return excess_genes
-
-
