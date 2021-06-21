@@ -45,7 +45,7 @@ class Neuron:
             population.append(a)
         return population
 
-    def forward(self, net):     # переделать
+    def forward(self, net):     # отсортировать связи сеть и потом посчитать
         data = self.data[self.data_iter]
         if self.data_iter > 500:
             self.data_iter = 0
@@ -55,18 +55,20 @@ class Neuron:
         for i in range(len(net.nodes)):
             sum_matrix[i] = [0.0] * len(net.nodes)
         previous_list = []
-        for (_, conn) in net.connections.items():
+        sort_conn_list = self.sort_connections(net)
+        for (i, conn) in net.connections.items():
             if not conn.state:
                 continue
-            in_node = conn.input_n - 1
-            out_node = conn.output - 1
+            in_node = sort_conn_list[i-1][0] - 1
+            out_node = sort_conn_list[i-1][1] - 1
+            weigh = self.find_weigh(net, in_node+1, out_node+1)
             if in_node < self.number_of_in and in_node not in previous_list:
                 data_iter += 1
-                x = data[data_iter] * conn.weight
+                x = data[data_iter] * weigh
             elif in_node < self.number_of_in and in_node in previous_list:
-                x = data[data_iter] * conn.weight
+                x = data[data_iter] * weigh
             else:
-                x = np.sum(sum_matrix[in_node]) * conn.weight
+                x = np.sum(sum_matrix[in_node]) * weigh
             previous_list.append(in_node)
             sum_matrix[out_node][in_node] = self.sigmoid(x)
 
@@ -78,3 +80,17 @@ class Neuron:
     @staticmethod
     def sigmoid(x):
         return 1 / (1 + np.exp(-x))
+
+    @staticmethod
+    def sort_connections(net):
+        conn_list = []
+        for (_, conn) in net.connections.items():
+            conn_list.append([conn.input_n, conn.output])
+        conn_list.sort()
+        return conn_list
+
+    @staticmethod
+    def find_weigh(net, in_node, out_node):
+        for (_, conn) in net.connections.items():
+            if conn.input_n == in_node and conn.output == out_node:
+                return conn.weight

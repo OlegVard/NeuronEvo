@@ -34,7 +34,7 @@ class Genome:
     def mutate_node(self):
         conn_index = random.randint(1, len(self.connections))
         conn = self.connections.get(conn_index)
-        while conn is None:
+        while conn is None or not conn.state:
             conn_index = random.randint(1, len(self.connections))
             conn = self.connections.get(conn_index)
 
@@ -150,7 +150,7 @@ class Genome:
     @staticmethod
     def types_division(type_a, type_b, num_types):
         c1, c2, c3 = 0.3, 0.3, 0.3
-        Bt = 0.15
+        Bt = 0.20
         for i in range(num_types):
             N = max((len(type_a[i][0].connections), len(type_b.connections)))
             B = (c1 * Genome.excess_genes(type_a[i][0], type_b) +
