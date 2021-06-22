@@ -29,32 +29,17 @@ class Neuron:
                                              round(random.random(), 2),
                                              True,
                                              a.connections_innovations()))
-                if random.random() < 0.2:
-                    if out == self.number_of_in + 1:
-                        a.add_connection(Connections(j + 1,
-                                                     self.number_of_in + 2,
-                                                     round(random.random(), 2),
-                                                     True,
-                                                     a.connections_innovations()))
-                    else:
-                        a.add_connection(Connections(j + 1,
-                                                     self.number_of_in + 1,
-                                                     round(random.random(), 2),
-                                                     True,
-                                                     a.connections_innovations()))
             population.append(a)
         return population
 
-    def forward(self, net):     # отсортировать связи сеть и потом посчитать
+    def forward(self, net, test=False):     # поиск в ширину в обратную сторону
         data = self.data[self.data_iter]
-        if self.data_iter > 500:
+        if self.data_iter > 500 and not test:
             self.data_iter = 0
         sum_matrix = [0.0] * len(net.nodes)
-        data_iter = 0
-
+        x = 0
         for i in range(len(net.nodes)):
             sum_matrix[i] = [0.0] * len(net.nodes)
-        previous_list = []
         sort_conn_list = self.sort_connections(net)
         for (i, conn) in net.connections.items():
             if not conn.state:
@@ -62,20 +47,18 @@ class Neuron:
             in_node = sort_conn_list[i-1][0] - 1
             out_node = sort_conn_list[i-1][1] - 1
             weigh = self.find_weigh(net, in_node+1, out_node+1)
-            if in_node < self.number_of_in and in_node not in previous_list:
-                data_iter += 1
-                x = data[data_iter] * weigh
-            elif in_node < self.number_of_in and in_node in previous_list:
-                x = data[data_iter] * weigh
+            if in_node < self.number_of_in:
+                x = data[in_node] * weigh
             else:
-                x = np.sum(sum_matrix[in_node]) * weigh
-            previous_list.append(in_node)
+                if (np.sum(sum_matrix[in_node])) == 0:
+                    sort_conn_list.append(sort_conn_list.pop(i-1))
+                else:
+                    x = np.sum(sum_matrix[in_node]) * weigh
             sum_matrix[out_node][in_node] = self.sigmoid(x)
 
         out1 = self.sigmoid(np.sum(sum_matrix[self.number_of_out + self.number_of_in - 2]))
-        out2 = self.sigmoid(np.sum(sum_matrix[self.number_of_out + self.number_of_in - 1]))
 
-        return out1, out2, data[-2:]
+        return out1, data[-1:]
 
     @staticmethod
     def sigmoid(x):

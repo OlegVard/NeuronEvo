@@ -1,4 +1,4 @@
-def get_data(train=525):
+def get_data(train=225):
     f = open('cancer2.dt', 'r')
     train_data = []
     for i in range(train):

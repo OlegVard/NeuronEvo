@@ -34,9 +34,6 @@ class Genome:
     def mutate_node(self):
         conn_index = random.randint(1, len(self.connections))
         conn = self.connections.get(conn_index)
-        while conn is None or not conn.state:
-            conn_index = random.randint(1, len(self.connections))
-            conn = self.connections.get(conn_index)
 
         inp = self.nodes[conn.input_n]
         out = self.nodes[conn.output]
@@ -86,6 +83,10 @@ class Genome:
 
         if node_1.type == NodeType.Output and node_2.type == NodeType.Input:
             node_1, node_2 = node_2, node_1
+
+        if node_1.type == NodeType.Hidden and node_2.type == NodeType.Hidden:
+            if node_1.id > node_2.id:
+                node_1, node_2 = node_2, node_1
 
         for (_, conn) in self.connections.items():
             if (conn.input_n == node_1.id and conn.output == node_2.id) or \
