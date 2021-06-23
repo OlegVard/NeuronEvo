@@ -29,12 +29,25 @@ class Neuron:
                                              round(random.random(), 2),
                                              True,
                                              a.connections_innovations()))
+                if random.random() < 0.2:
+                    if out == self.number_of_in + 1:
+                        a.add_connection(Connections(j + 1,
+                                                     self.number_of_in + 2,
+                                                     round(random.random(), 2),
+                                                     True,
+                                                     a.connections_innovations()))
+                    else:
+                        a.add_connection(Connections(j + 1,
+                                                     self.number_of_in + 1,
+                                                     round(random.random(), 2),
+                                                     True,
+                                                     a.connections_innovations()))
             population.append(a)
         return population
 
     def forward(self, net, test=False):     # поиск в ширину в обратную сторону
         data = self.data[self.data_iter]
-        if self.data_iter > 500 and not test:
+        if self.data_iter > 400 and not test:
             self.data_iter = 0
         sum_matrix = [0.0] * len(net.nodes)
         x = 0
@@ -57,8 +70,9 @@ class Neuron:
             sum_matrix[out_node][in_node] = self.sigmoid(x)
 
         out1 = self.sigmoid(np.sum(sum_matrix[self.number_of_out + self.number_of_in - 2]))
+        out2 = self.sigmoid(np.sum(sum_matrix[self.number_of_out + self.number_of_in - 1]))
 
-        return out1, data[-1:]
+        return out1, out2, data[-2:]
 
     @staticmethod
     def sigmoid(x):

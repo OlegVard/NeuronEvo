@@ -1,4 +1,4 @@
-from Neuron_1 import Neuron
+from Neuron import Neuron
 from Genome import Genome
 import random
 
@@ -25,14 +25,14 @@ def cell_funk(persons, net_obj):
     return fitness_list
 
 
-def find_best(fit_list):
+def find_best(fitt_list):
     min_list = []
-    for i in range(len(fit_list)):
-        min_list.append(min(fit_list[i]))
+    for i_iter in range(len(fitt_list)):
+        min_list.append(min(fitt_list[i_iter]))
 
     min_error = min(min_list)
     min_index_x = min_list.index(min_error)
-    min_index_y = fit_list[min_index_x].index(min_error)
+    min_index_y = fitt_list[min_index_x].index(min_error)
     return min_index_x, min_index_y
 
 
@@ -42,14 +42,16 @@ def find_best_in_species(fit_species):
     return new_index
 
 
-def final_forward(net, best_person):
+def final_forward(net, best_person, final=False):
     right_count = 0
     data_i = net.data_iter
-    net.data_iter = 499
-    for i in range(50):
+    net.data_iter = 400
+    for i_iter in range(50):
         best_out1, best_out2, ref = net.forward(best_person, test=True)
         if round(best_out1) == ref[0] and round(best_out2) == ref[1]:
             right_count += 1
+            if final:
+                print(best_out1, best_out2)
         net.data_iter += 1
     net.data_iter = data_i
     return right_count / 50
@@ -60,9 +62,11 @@ for i in range(1000):
     best_index_x, best_index_y = find_best(fit_list)
     best = fit_list[best_index_x][best_index_y]
     acc = final_forward(net, population[best_index_x][best_index_y])
-    if best <= 0.1e-2:
-        print('Алгоритм завершен')
-        population[best_index_x][best_index_y].render('final.gv')
+    if acc >= 0.8:
+        acc = final_forward(net, population[best_index_x][best_index_y], final=True)
+        print('Алгоритм завершен на ', i, 'итерации. Точность =', acc)
+        name = 'final' + str(i) + '.gv'
+        population[best_index_x][best_index_y].render(name)
         break
     else:
         new_pop = []
@@ -107,11 +111,11 @@ for i in range(1000):
                 pop[new_pop[j].species].append(new_pop[j])
 
         if i % 10 == 0:
-            print('iteration', i, 'best', best,
-                  'accuracy =', acc)
+            print('Итерация', i, 'Лучший', best)
             name = 'iteration' + str(i) + '.gv'
             population[best_index_x][best_index_y].render(name)
 
+        population.clear()
         for j in range(len(pop)):
             if len(pop[j]) != 0:
                 population.append(pop[j])
